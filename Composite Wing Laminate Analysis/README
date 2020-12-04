@@ -3,6 +3,8 @@ The following was developed to fulfill the requirements of SE 143A & B --> which
 
 The goal of the Capstone was to develop a fully functional and modular code to analyze the structural and dynamic components of a composite VTOL UAV. Each member of our team worked to reach this goal. My job as the composite material lead - was to develop a script which calculates ply failure in a given lamina at every user discretized point and cross section, along the upper and lower skin of each UAV wing. The png above depicts the analyzed cross section and nodes at which analysis was done.
 
+The 'FPF2020' code shown above, is the manifestation of this goal and takes in a variety of inputs as a result. Via the layup input file, the user is to define to laminate ID for all possible laminates along the airfoil. Those with a background in composite materials know that, each ply of a laminate carries with it its own subsequent material properties, ply thickness and rotation angle. The first part of the code accounts for this, by pulling the material properties of each ply (for each laminate) from the material database ~ after which material properties for each of the laminate(s) are calculated 
+
 
 
 
