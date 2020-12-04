@@ -1,35 +1,122 @@
 %% SETUP
+function [STORE,prop] = FPF2020(NxMatrix,NxyMatrix)
 tic
-close all  % Close all files
-clear all  % Clear all variables
-clc        % Clear command line 
-tic
-inFile  = 'SE142_3_Laminate_Input.xlsx';  % Excel file with input data
 inFile2  = 'SE142_Material_DataBase.xlsx';
-outFile = 'SE142_3_Laminate_Output1.xlsx'; % Excel file for calculated output
-input =  xlsread(inFile, 1, 'E43:E51');
-inputu = input(1);
-outputu = input(2);
-n = input(3);
-NX= input(4);
-NY = input(5);
-NXY  =input(6);
-MX = input(7);
-MY = input(8);
-MXY = input(9);
-SF = xlsread(inFile, 1, 'E54');
-%% INPUT MANIPULATION
-compID = xlsread(inFile, 1, 'I44:I55');
-compID = flip(compID)';
-rot = (xlsread(inFile, 1, 'J44:J55'))';
-rot = flip(rot);
-tply = xlsread(inFile, 1, 'K44:K55');
-tply = flip(tply)';
-[comp_all,compnames,rawc] = xlsread(inFile2, 1, 'E55:V85');
+inFile3  = 'LAYUP INPUT.xlsx';
+ININ = xlsread(inFile3,1,'B2:M33');
+STORE = {};
+prop = {};
+store = {'Node #' 'CompID' 'FAILURE MODE' 'PLY NUMBER' 'MARGIN OF SAFETY' 'Nx' 'Nxy'}; 
+prop{2,1} = 'CompID' ;
+prop{3,1} = 'THICKNESS';
+prop{4,1} ='EX';
+prop{5,1} = 'GXY';
+prop{6,1} = 'SIGMAT*';
+prop{7,1} = 'SIGMAC*';
+prop{8,1} = 'SIGMAS*';
 
+%% INPUT FOR EACH LAMINATE
+ID = xlsread(inFile3,2,'B2:B53');
+
+p = 1;       %loop for each node
+q = 1;        %Loop for each cross section
+while true
+NX = NxMatrix(p,1,q);
+IDD = NxMatrix(p,2,q);
+%NXY  = 0 ;
+NY = 1;
+NXY = NxyMatrix(p,1,q);
+MX = 0;
+MY = 0;
+MXY = 0;
+SF = 1.5;
+% Number of plies
+n1 = ones(1,ININ(25,1));
+n2 = ones(1,ININ(26,1));
+n3 = ones(1,ININ(27,1));
+n4 = ones(1,ININ(28,1));
+n5 = ones(1,ININ(29,1));
+n6 = ones(1,ININ(30,1));
+n7 = ones(1,ININ(31,1));
+n8 = ones(1,ININ(32,1));
+%ID's
+compID1 = ININ(1,:);
+compID2 = ININ(2,:);
+compID3 = ININ(3,:);
+compID4 = ININ(4,:);
+compID5 =  ININ(5,:);
+compID6 =  ININ(6,:) ;
+compID7 =  ININ(7,:) ;
+compID8 =  ININ(8,:) ;
+%rotations
+rot1 = ININ(17,:);
+rot2 = ININ(18,:);
+rot3 = ININ(19,:);
+rot4 = ININ(20,:);
+rot5 = ININ(21,:);
+rot6 = ININ(22,:);
+rot7 = ININ(23,:);
+rot8 = ININ(24,:);
+%thicknesses
+tply1 = ININ(9,:);
+tply2 = ININ(10,:);
+tply3 = ININ(11,:);
+tply4 = ININ(12,:);
+tply5 = ININ(13,:);
+tply6 = ININ(14,:);
+tply7 = ININ(15,:);
+tply8 = ININ(16,:);
+tply(find(isnan(tply)))=[];
+n(find(isnan(n)))=[];
+compID(find(isnan(compID)))=[];
+rot(find(isnan(rot)))=[];
+%% MANIPULATION
+if IDD == 1
+    compID = compID1;
+    rot = rot1;
+    tply = tply1;
+    n = length(n1);
+elseif IDD == 2
+    compID = compID2;
+    rot = rot2;
+    tply = tply2;
+    n = length(n2);
+elseif IDD == 3
+    compID = compID3;
+    rot = rot3;
+    tply = tply3;
+    n = length(n3);
+elseif IDD == 4
+    compID = compID4;
+    rot = rot4;
+    tply = tply4;
+    n = length(n4);
+elseif IDD == 5
+    compID = compID5;
+    rot = rot5;
+    tply = tply5;
+    n = length(n5);
+elseif IDD == 6
+    compID = compID6;
+    rot = rot6;
+    tply = tply6;
+    n = length(n6);
+elseif IDD == 7
+    compID = compID7;
+    rot = rot7;
+    tply = tply7;
+    n = length(n7);
+elseif IDD == 8
+    compID = compID8;
+    rot = rot8;
+    tply = tply8;
+    n = length(n8);
+end
+[comp_all,compnames,rawc]=  xlsread(inFile2, 1, 'E55:V85');
 comp_p = [];
 compIDloop = [1:8];
 k = 1;
+
 while true
 for i = 1:8
 if compID(k) == compIDloop(1,i)
@@ -178,7 +265,7 @@ ABD(4:6,1:3) = B;
 ABD(4:6,4:6) = D;
 ABDinv = (inv(ABD));
 %% Equivalent laminate stiffness properties  
-tlam = sum(tply)*n;
+tlam = sum(tply);
 EX = det(A)/(((A(2,2)*A(3,3)) - (A(2,3)^2))*tlam);
 EY = det(A)/(((A(1,1)*A(3,3)) - (A(1,3)^2))*tlam);
 GXY = det(A)/(((A(1,1)*A(2,2)) - (A(1,2)^2))*tlam);
@@ -295,28 +382,38 @@ else
 plyfail = r(1)/2;
 end
 %% FINAL RESULTS
-if c ==1 
-    disp('Fiber Fail in ply number:')
-    disp(plyfail)
-    disp('MOS OF PLY:')
-    disp(minimum)
+if c == 1 
+    failtype = 'Fiber Fail';
 elseif c == 2 
-    disp('Matrix Fail in ply number:')
-    disp(plyfail)
-    disp('MOS OF PLY:')
-    disp(minimum)
+    failtype = 'Matrix Fail';
 elseif c == 3
-    disp('Shear Fail in ply number:')
-    disp(plyfail)
-    disp('MOS OF PLY:')
-    disp(minimum)
+    failtype = 'Shear Fail';
+end
+%% BOTTOM OF LOOP
+store{p+1,1} = p;
+store{p+1,2} = IDD;
+store{p+1,3} = failtype;
+store{p+1,4} = plyfail;
+store{p+1,5} = minimum;
+store{p+1,6} = NxMatrix(p,1,q);
+store{p+1,7} = NxyMatrix(p,1,q);
+ST = min([F1T F2T]);
+SC = min([F1C F2C]);
+SS = min([FSS]);
+
+%%%
+p = p+1 ;
+if p == length(NxMatrix(:,:,1)) + 1
+    p = 1 ;
+    STORE{q} = store ;
+    q = q+1 ;
+    end
+if q == length(NxMatrix(1,1,:)) + 1
+    break 
+end
+clearvars -except p NxMatrix q inFile2 store t STORE NxyMatrix inFile3 ININ prop
+
 end
 toc
-
-
-
-
-
-
-
+end
 
