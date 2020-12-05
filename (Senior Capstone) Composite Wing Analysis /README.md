@@ -1,3 +1,4 @@
+## Composite Wing Analysis of a Vertical Take-Off and Landing UAV
 The following was developed to fulfill the requirements of SE 143A & B --> which is the senior capstone sequence at the University of California San Diego's Aerospace structures program (under the structural engineering department).
 
 The goal of the Capstone was to develop a fully functional and modular code to analyze the structural and dynamic components of a composite VTOL UAV. Each member of our team worked to reach this goal. My job as the composite material lead - was to develop a script which calculates FIRST ply failure in a given laminate at every user discretized point and cross section along the upper and lower skin of each UAV wing. The png above depicts the analyzed cross section and nodes at which analysis was done.
